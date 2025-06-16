@@ -1,0 +1,4 @@
+# Intelij IDE
+.idea/
+# Also ignore macOS system files
+.DS_Store

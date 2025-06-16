@@ -1,0 +1,41 @@
+{
+  "tasks": {
+    "cache:reload": "deno cache --reload --import-map=../import_map.json **/*.ts",
+    "dev": "cd ../.. && supabase functions serve --no-verify-jwt --import-map=./supabase/import_map.json",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "pre-commit": "deno fmt && deno lint && deno task test:unit && deno task test:e2e",
+    "type:db": "cd ../.. && supabase gen types typescript --local > supabase/functions/src/integrations/db/generated.types.ts",
+    "test:unit": "deno test --allow-env --allow-net --allow-read --env-file=.env --import-map=../import_map.json \"**/*.spec.ts\"",
+    "test:e2e": "deno test --allow-env --allow-net --allow-read --env-file=.env --import-map=../import_map.json \"**/*.e2e.ts\"",
+    "test:conf": "deno test --allow-env --allow-net --allow-read --env-file=.env --import-map=../import_map.json"
+  },
+  "importMap": "../import_map.json",
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": false,
+    "proseWrap": "always",
+    "semiColons": true,
+    "spaceSurroundingProperties": true
+  },
+  "lint": {
+    "rules": {
+      "include": [
+        "no-unused-vars",
+        "eqeqeq",
+        "no-throw-literal",
+        "semi",
+        "prefer-const",
+        "quotes"
+      ]
+    },
+    "include": ["**/*.ts"],
+    "report": "pretty"
+  },
+  "compilerOptions": {
+    "strict": true
+  },
+  "denoVersion": "^2.0.0"
+}

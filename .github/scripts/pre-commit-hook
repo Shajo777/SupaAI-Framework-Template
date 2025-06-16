@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Change to the project directory
+cd "$(git rev-parse --show-toplevel)"
+
+# Run the pre-commit task in the Deno project
+cd supabase/functions
+deno task pre-commit
+
+# If the task fails, prevent the commit
+if [ $? -ne 0 ]; then
+  echo "Pre-commit checks failed. Please fix the issues before committing."
+  exit 1
+fi
+
+exit 0

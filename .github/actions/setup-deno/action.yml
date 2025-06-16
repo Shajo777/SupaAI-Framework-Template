@@ -1,0 +1,30 @@
+name: "Setup Deno Environment"
+description: "Sets up Deno environment with caching for faster workflows"
+inputs:
+  deno-version:
+    description: "Version of Deno to install"
+    required: false
+    default: "v2.x"
+  cache-key:
+    description: "Custom cache key for dependencies"
+    required: false
+    default: "deno-deps"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ inputs.deno-version }}
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.deno
+          ~/.cache/deno
+          ~/.cache/deno/npm
+        key: ${{ runner.os }}-deno-${{ inputs.cache-key }}-${{ hashFiles('supabase/functions/deno.lock', 'supabase/import_map.json') }}
+        restore-keys: |
+          ${{ runner.os }}-deno-${{ inputs.cache-key }}-

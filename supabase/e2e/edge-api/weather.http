@@ -1,0 +1,42 @@
+### Login First
+POST {{baseUrl}}/auth/v1/token?grant_type=password
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "email": "{{user.email}}",
+  "password": "{{user.password}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.access_token);
+  client.global.set("user_id", response.body.user.id);
+  client.log("ENV:" + JSON.stringify(client.global, null, 2));
+%}
+
+### Get Weather - First Question
+POST {{baseUrl}}/functions/v1/weather
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "message": "What's the weather like in München?",
+  "userId": "{{user_id}}",
+  "location": "München"
+}
+
+> {%
+  client.global.set("thread_id", response.body.threadId);
+%}
+
+### Get Weather - Second Question
+POST {{baseUrl}}/functions/v1/weather
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "message": "What's the weather like in New York?",
+  "userId": "{{user_id}}",
+  "threadId": "{{thread_id}}",
+  "location": "New York"
+}

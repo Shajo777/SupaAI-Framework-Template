@@ -1,0 +1,426 @@
+openapi: 3.0.1
+info:
+  title: tellsout Learning Platform API
+  description: REST API for creating and managing AI-driven training modules, sources, lessons, leaderboards, and user settings.
+  version: "1.0.0"
+servers:
+  - url: https://api.tellsout.com/v1
+    description: Production server
+paths:
+  /trainings:
+    get:
+      summary: List all trainings
+      tags:
+        - Trainings
+      responses:
+        "200":
+          description: A list of trainings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Training"
+    post:
+      summary: Create a new training draft
+      tags:
+        - Trainings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingCreate"
+      responses:
+        "201":
+          description: Training created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Training"
+  /trainings/{trainingId}:
+    parameters:
+      - name: trainingId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get training details
+      tags:
+        - Trainings
+      responses:
+        "200":
+          description: Training details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingDetail"
+    put:
+      summary: Update training (only in draft)
+      tags:
+        - Trainings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingUpdate"
+      responses:
+        "200":
+          description: Training updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Training"
+    delete:
+      summary: Delete training (only in draft)
+      tags:
+        - Trainings
+      responses:
+        "204":
+          description: Training deleted
+  /trainings/{trainingId}/sources:
+    get:
+      summary: List sources for a training
+      tags:
+        - Sources
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+      responses:
+        "200":
+          description: List of sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Source"
+    post:
+      summary: Add a source to a training (draft only)
+      tags:
+        - Sources
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: AssistantSource added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Source"
+    delete:
+      summary: Remove a source from a training (draft only)
+      tags:
+        - Sources
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: AssistantSource deleted
+  /trainings/{trainingId}/lessons:
+    get:
+      summary: Paginated list of lessons
+      tags:
+        - Lessons
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated lessons
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonPage"
+    post:
+      summary: Create a lesson (draft only)
+      tags:
+        - Lessons
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonCreate"
+      responses:
+        "201":
+          description: Lesson created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+  /trainings/{trainingId}/lessons/{lessonId}:
+    delete:
+      summary: Delete a lesson (draft only)
+      tags:
+        - Lessons
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Lesson deleted
+  /trainings/{trainingId}/leaderboard:
+    get:
+      summary: Get leaderboard for a training
+      tags:
+        - Leaderboard
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+  /trainings/{trainingId}/stats:
+    get:
+      summary: Get training statistics
+      tags:
+        - Stats
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+      responses:
+        "200":
+          description: Training stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingStats"
+  /trainings/{trainingId}/lessons/{lessonId}/stats:
+    get:
+      summary: Get lesson statistics
+      tags:
+        - Stats
+      parameters:
+        - $ref: "#/components/parameters/TrainingId"
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lesson stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonStats"
+  /settings:
+    get:
+      summary: Get user settings
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: User settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+    put:
+      summary: Update user settings
+      tags:
+        - Settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSettingsUpdate"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+components:
+  parameters:
+    TrainingId:
+      name: trainingId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Training:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        main_goal:
+          type: string
+        status:
+          type: string
+          enum: [draft, published]
+        visibility:
+          type: string
+          enum: [public, private]
+        created_at:
+          type: string
+          format: date-time
+    TrainingCreate:
+      type: object
+      required: [title, description, main_goal]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        main_goal:
+          type: string
+        visibility:
+          type: string
+          enum: [public, private]
+    TrainingUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        main_goal:
+          type: string
+    TrainingDetail:
+      allOf:
+        - $ref: "#/components/schemas/Training"
+        - type: object
+          properties:
+            sources:
+              type: array
+              items:
+                $ref: "#/components/schemas/Source"
+            lessons:
+              type: array
+              items:
+                $ref: "#/components/schemas/Lesson"
+    Source:
+      type: object
+      properties:
+        id:
+          type: string
+        file_name:
+          type: string
+        url:
+          type: string
+        uploaded_at:
+          type: string
+          format: date-time
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        lesson_goal:
+          type: string
+        chapter:
+          type: integer
+        order_index:
+          type: integer
+    LessonCreate:
+      type: object
+      required: [title, lesson_goal]
+      properties:
+        title:
+          type: string
+        lesson_goal:
+          type: string
+        chapter:
+          type: integer
+    LessonPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Lesson"
+        page:
+          type: integer
+        perPage:
+          type: integer
+        total:
+          type: integer
+    LeaderboardEntry:
+      type: object
+      properties:
+        user_id:
+          type: string
+        user_name:
+          type: string
+        avg_rating:
+          type: number
+        xp:
+          type: integer
+    TrainingStats:
+      type: object
+      properties:
+        eval_count:
+          type: integer
+        avg_score:
+          type: number
+        progress:
+          type: number
+    LessonStats:
+      type: object
+      properties:
+        good_tags:
+          type: integer
+        bad_tags:
+          type: integer
+        avg_duration:
+          type: number
+    UserSettings:
+      type: object
+      properties:
+        language:
+          type: string
+        social_links:
+          type: object
+    UserSettingsUpdate:
+      type: object
+      properties:
+        language:
+          type: string
+        social_links:
+          type: object

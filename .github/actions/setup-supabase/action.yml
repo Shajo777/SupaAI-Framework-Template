@@ -1,0 +1,41 @@
+name: "Setup Supabase Environment"
+description: "Sets up Supabase environment for testing, including PostgreSQL client, migrations, and configuration"
+inputs:
+  postgres-password:
+    description: "Password for PostgreSQL database"
+    required: false
+    default: "postgres"
+  migrations-path:
+    description: "Path to the migrations directory"
+    required: false
+    default: "supabase/migrations"
+  functions-path:
+    description: "Path to the functions directory"
+    required: false
+    default: "supabase/functions"
+  postgres-port:
+    description: "Port for PostgreSQL database"
+    required: false
+    default: "54322"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache PostgreSQL client
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-postgresql-${{ hashFiles('supabase/functions/deno.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-postgresql-
+
+    - name: Install PostgreSQL client
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client curl
+
+    - name: Setup Supabase CLI
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest

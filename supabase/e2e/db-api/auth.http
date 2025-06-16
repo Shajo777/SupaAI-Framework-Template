@@ -1,0 +1,111 @@
+### User Registration
+POST {{baseUrl}}/auth/v1/signup
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "email": "{{user.email}}",
+  "password": "{{user.password}}",
+  "data": {
+    "name": "{{user.name}}",
+    "preferred_language": "{{user.lang}}"
+  }
+}
+
+### Login First
+POST {{baseUrl}}/auth/v1/token?grant_type=password
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "email": "{{user.email}}",
+  "password": "{{user.password}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.access_token);
+  client.global.set("user_id", response.body.user.id);
+  client.log("ENV:" + JSON.stringify(client.global, null, 2));
+%}
+
+### Logout
+POST {{baseUrl}}/auth/v1/logout
+Content-Type: application/json
+apikey: {{token}}
+Authorization: Bearer {{auth_token}}
+
+{}
+
+### Get User
+GET {{baseUrl}}/auth/v1/user
+apikey: {{token}}
+Authorization: Bearer {{auth_token}}
+
+### Update User
+PUT {{baseUrl}}/auth/v1/user
+Content-Type: application/json
+apikey: {{token}}
+Authorization: Bearer {{auth_token}}
+
+{
+  "email": "updated@example.com",
+  "password": "newSecurePassword456",
+  "data": {
+    "name": "Updated User",
+    "preferred_language": "de"
+  }
+}
+
+### Delete User
+DELETE {{baseUrl}}/auth/v1/user
+apikey: {{token}}
+Authorization: Bearer {{auth_token}}
+
+### Send Password Reset Email
+POST {{baseUrl}}/auth/v1/recover
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "email": "test@example.com"
+}
+
+### Verify Email
+POST {{baseUrl}}/auth/v1/verify
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "type": "signup",
+  "token": "verification_token_here"
+}
+
+### Refresh Token
+POST {{baseUrl}}/auth/v1/token?grant_type=refresh_token
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "refresh_token": "your_refresh_token_here"
+}
+
+### Change Password (when logged in)
+PUT {{baseUrl}}/auth/v1/user
+Content-Type: application/json
+apikey: {{token}}
+Authorization: Bearer {{auth_token}}
+
+{
+  "password": "newSecurePassword789"
+}
+
+### Reset Password with Recovery Token
+POST {{baseUrl}}/auth/v1/recover
+Content-Type: application/json
+apikey: {{token}}
+
+{
+  "email": "test@example.com",
+  "password": "newSecurePassword789",
+  "token": "recovery_token_here"
+}
